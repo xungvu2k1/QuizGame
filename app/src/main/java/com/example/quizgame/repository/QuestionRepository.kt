@@ -7,8 +7,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class QuestionRepository(var onQuestionLoad : OnQuestionLoad) {
-    private var firebaseFirestore: FirebaseFirestore = Firebase.firestore
-    private lateinit var questionId : String
+    private val firebaseFirestore: FirebaseFirestore = Firebase.firestore
     private var questionNum : Int? = null
 
     fun getQuestionNum():Int?{

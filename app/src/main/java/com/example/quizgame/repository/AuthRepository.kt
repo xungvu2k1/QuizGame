@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class AuthRepository( var application : Application) {
-
     val firebaseUserMutableLiveData = MutableLiveData< FirebaseUser? >()
     val firebaseAuth = FirebaseAuth.getInstance()
 

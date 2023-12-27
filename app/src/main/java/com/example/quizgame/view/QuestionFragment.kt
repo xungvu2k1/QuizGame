@@ -47,8 +47,6 @@ class QuestionFragment : Fragment() {
     private var countdownTimer : CountDownTimer? = null
     private var correctAnswerNum : Int = 0
     private var incorrectAnswerNum : Int = 0
-    private var wrongTemp : Int = 0 // biến tạm thời lưu trữ câu sai trước thời điểm chọn đáp án
-    private var correctTemp : Int = 0
     private var isAnswerSelected: Boolean = false
     private var isIncreased : Boolean = false // đánh dấu đã tăng câu sai
 
@@ -99,11 +97,6 @@ class QuestionFragment : Fragment() {
             showQuizGameDialog(requireContext(), bundle)
         }
         nextQueBtn.setOnClickListener{
-//            if (wrongTemp == viewModel.getIncorrectAnswerNum() && correctTemp == viewModel.getCorrectAnswerNum() ){
-//                incorrectAnswerNum ++
-//                num_incorrect_answerTv.text = incorrectAnswerNum.toString()
-//                viewModel.setIncorrectAnswerNum(incorrectAnswerNum)
-//            }
             if (!isAnswerSelected && !isIncreased ) {
                 // Người dùng không chọn đáp án, tăng số câu sai lên 1
                 incorrectAnswerNum++
@@ -176,12 +169,11 @@ class QuestionFragment : Fragment() {
     }
 
     private fun loadQuestions(currentIndexQuestion : Int){
-        hideQuizViews() // ẩn các view để hiển thị progressbar
+        hideQuizViews()
         viewModel.getQuestionMutableLiveData().observe(viewLifecycleOwner){
-            //Observer override onChanged
             listQuestion->
             if (listQuestion != null){
-                showQuizViews() // hiển thị các view
+                showQuizViews()
                 displayQuizData(listQuestion[currentIndexQuestion], currentIndexQuestion)
                 viewModel.setCurrentIndexQuestion(currentIndexQuestion)
             }
@@ -256,6 +248,7 @@ class QuestionFragment : Fragment() {
         countTimer()
 
     }
+
     fun checkAnswer(selectedAns : String, answer : String){
         when (answer){
             option1Btn.text.toString() -> setButtonBackground(option1Btn, true)
@@ -264,21 +257,14 @@ class QuestionFragment : Fragment() {
             option4Btn.text.toString() -> setButtonBackground(option4Btn, true)
         }
         if (selectedAns == answer){
-            // tăng số câu hỏi đúng
-            Log.e("check correct", "Dung that")
-            correctTemp = correctAnswerNum // lưu lại giá trị correct
             correctAnswerNum++
             num_correct_answerTv.text = correctAnswerNum.toString()
             viewModel.setCorrectAnswerNum(correctAnswerNum)
         } else {
-            wrongTemp = incorrectAnswerNum
-            Log.e("checkwrong", "else1: $wrongTemp")
             incorrectAnswerNum += 1
             isIncreased = true
-            Log.e("checkwrong", "else2: $wrongTemp")
             num_incorrect_answerTv.text = incorrectAnswerNum.toString()
             viewModel.setIncorrectAnswerNum(incorrectAnswerNum)
-            Log.e("check incorrect", "Sai that")
 
             when (selectedAns) {
                 option1Btn.text.toString() -> setButtonBackground(option1Btn, false)
@@ -307,7 +293,6 @@ class QuestionFragment : Fragment() {
             }
 
             override fun onFinish() {
-                // Thực hiện hành động khi đếm ngược kết thúc
                 timerCountTv.text = "0"
 
                 if (!isAnswerSelected) {
@@ -331,6 +316,4 @@ class QuestionFragment : Fragment() {
             button.setBackgroundColor(Color.RED)
         }
     }
-
-
 }
