@@ -1,18 +1,34 @@
 package com.example.quizgame.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.quizgame.model.Question
+import com.example.quizgame.repository.OnQuestionLoad
 import com.example.quizgame.repository.QuestionRepository
 
-class QuestionViewModel : ViewModel(), QuestionRepository.OnQuestionLoad {
-    private lateinit var questionMutableLiveData: MutableLiveData<List<Question>> // nhận vào 1 list các question
-    private lateinit var repository : QuestionRepository
+class QuestionViewModel : ViewModel(), OnQuestionLoad {
+    private var questionMutableLiveData: MutableLiveData<List<Question>> = MutableLiveData()
+    private var repository : QuestionRepository = QuestionRepository(this)
+    private var currentIndexQuestion : Int = 0
+    private var correctAnswerNum : Int = 0
+    private var incorrectAnswerNum : Int = 0
 
-    init {
-        questionMutableLiveData = MutableLiveData()
-        repository = QuestionRepository(this)
+    fun setCorrectAnswerNum(correctAnswerNum: Int){
+        this.correctAnswerNum = correctAnswerNum
+    }
+
+    fun setIncorrectAnswerNum(incorrectAnswerNum : Int){
+        this.incorrectAnswerNum = incorrectAnswerNum
+    }
+
+    fun getQuestionNum():Int?{
+        return repository.getQuestionNum()
+    }
+    fun getCurrentIndexQuestion() : Int{
+        return currentIndexQuestion
+    }
+    fun setCurrentIndexQuestion(index : Int){
+        currentIndexQuestion = index
     }
 
     fun getQuestionMutableLiveData() : MutableLiveData<List<Question>>{
@@ -23,16 +39,7 @@ class QuestionViewModel : ViewModel(), QuestionRepository.OnQuestionLoad {
         repository.getQuestions()
     }
 
-    fun setQuestionId (questionID : String){
-        repository.setQuestionID(questionID)
-    }
-
     override fun onLoad(questionModels: MutableList<Question>) {
         questionMutableLiveData.value = questionModels
-//        questionMutableLiveData.value = repository.getQuestions()
-    }
-
-    override fun onError(e: Exception?) {
-        Log.d("QuestionsError", "onError: " + e?.message)
     }
 }

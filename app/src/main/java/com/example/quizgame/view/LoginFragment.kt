@@ -1,21 +1,22 @@
 package com.example.quizgame.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.quizgame.R
 import android.widget.Button
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.example.quizgame.R
 import com.example.quizgame.viewmodel.AuthViewModel
-import com.google.android.material.textfield.TextInputEditText
 
 class LoginFragment : Fragment() {
+    private lateinit var authViewModel: AuthViewModel
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +26,10 @@ class LoginFragment : Fragment() {
 //        ).get<AuthViewModel>(
 //            AuthViewModel::class.java
 //        )
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+
 
     }
-
-    private var viewModel: AuthViewModel? = null
-    private var navController: NavController? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,23 +43,19 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
-        var startQuiz = view.findViewById<Button>(R.id.btn_start_quiz)
-        var signOut = view.findViewById<Button>(R.id.btn_sign_out)
+        val startQuiz = view.findViewById<Button>(R.id.btn_start_quiz)
+        val signOut = view.findViewById<Button>(R.id.btn_sign_out)
 
-        startQuiz.setOnClickListener() {
-            navController?.navigate(R.id.action_loginFragment_to_questionFragment)
+        startQuiz.setOnClickListener {
+                    navController.navigate(R.id.action_loginFragment_to_questionFragment)
         }
-        signOut.setOnClickListener(View.OnClickListener {
-            viewModel!!.signOut()
-            Toast.makeText(context, "Logout Successfully", Toast.LENGTH_SHORT).show()
-            viewModel!!.firebaseUserMutableLiveData.observe(this as LifecycleOwner) {
-//                        fun onChanged(firebaseUser: FirebaseUser?) {
-//                            if (it != null) {
-                navController?.navigate(R.id.action_loginFragment_to_signInFragment)
-//                            }
-//                        }
-            }
 
-        })
+        signOut.setOnClickListener{
+            authViewModel.signOut()
+            Toast.makeText(context, "Logout Successfully", Toast.LENGTH_SHORT).show()
+            authViewModel.firebaseUserMutableLiveData.observe(this as LifecycleOwner) {
+                navController.navigate(R.id.action_loginFragment_to_signInFragment)
+            }
+        }
     }
 }

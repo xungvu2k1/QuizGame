@@ -1,33 +1,35 @@
 package com.example.quizgame.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.example.quizgame.R
+import com.example.quizgame.model.Score
+import com.example.quizgame.viewmodel.ScoreViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ResultFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ResultFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var viewModel : ScoreViewModel
+    private lateinit var navController: NavController
+    private lateinit var exitBtn : Button
+    private lateinit var playAgainBtn : Button
+    private lateinit var num_correct_answerTv : TextView
+    private lateinit var num_incorrect_answerTv : TextView
+
+
+    private var correctAnswerNum : Int = 0
+    private var incorrectAnswerNum : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        viewModel = ViewModelProvider(this)[ScoreViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -38,23 +40,46 @@ class ResultFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_result, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ResultFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ResultFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        navController = Navigation.findNavController(view)
+        exitBtn = view.findViewById(R.id.btn_exit)
+        playAgainBtn = view.findViewById(R.id.btn_play_again)
+        num_correct_answerTv = view.findViewById(R.id.id_num_correc_answer)
+        num_incorrect_answerTv = view.findViewById(R.id.id_num_incorrec_answer)
+
+
+        getBundle()
+        num_correct_answerTv.text = correctAnswerNum.toString()
+        num_incorrect_answerTv.text = incorrectAnswerNum.toString()
+
+        // gửi data lên firebase
+        viewModel.sendScore(Score(incorrectAnswerNum, correctAnswerNum))
+
+        // xử lý sự kiện
+        playAgainBtn.setOnClickListener{
+            navController.navigate(R.id.questionFragment)
+        }
+
+        exitBtn.setOnClickListener{
+            navController.navigate(R.id.loginFragment)
+        }
+
+    }
+
+    fun getBundle(){
+        val resultBundle = arguments
+        if (resultBundle != null) {
+            val result: Score? = resultBundle.getParcelable("scoreKey")
+
+            if (result != null) {
+                incorrectAnswerNum = result.incorrectNum
+                correctAnswerNum = result.correctNum
+
+                // Sử dụng incorrectNum và correctNum ở đây
+                Log.d("ScoreFragment", "Incorrect Num: $incorrectAnswerNum, Correct Num: $correctAnswerNum")
             }
+        }
     }
 }

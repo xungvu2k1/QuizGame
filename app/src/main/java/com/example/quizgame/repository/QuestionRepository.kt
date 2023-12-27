@@ -1,21 +1,18 @@
 package com.example.quizgame.repository
 
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import com.example.quizgame.model.Question
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
 class QuestionRepository(var onQuestionLoad : OnQuestionLoad) {
     private var firebaseFirestore: FirebaseFirestore = Firebase.firestore
-//    private lateinit var questionMutableLiveData : MutableLiveData<List<Question>>
     private lateinit var questionId : String
+    private var questionNum : Int? = null
 
-    fun setQuestionID(questionId : String){
-        this.questionId = questionId
+    fun getQuestionNum():Int?{
+        return questionNum
     }
 
     fun getQuestions(){
@@ -27,17 +24,14 @@ class QuestionRepository(var onQuestionLoad : OnQuestionLoad) {
                     val _question = question.toObject(Question::class.java)
                     _listQuestion.add(_question)
                 }
-
+                questionNum = _listQuestion.size
                 onQuestionLoad.onLoad(_listQuestion)
             } else {
-                Log.e("abcd", "cssssss")
+                Log.e("getQuestions", "listQuestion null")
             }
         }
     }
-
-    interface OnQuestionLoad{
-        fun onLoad(questionModels :  MutableList<Question>)
-        fun onError(e : Exception?)
-    }
-
+}
+interface OnQuestionLoad{
+    fun onLoad(questionModels :  MutableList<Question>)
 }
