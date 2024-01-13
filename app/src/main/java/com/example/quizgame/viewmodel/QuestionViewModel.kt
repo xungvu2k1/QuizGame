@@ -1,25 +1,29 @@
 package com.example.quizgame.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.quizgame.model.Question
-import com.example.quizgame.repository.OnQuestionLoad
 import com.example.quizgame.repository.QuestionRepository
 
-class QuestionViewModel : ViewModel(), OnQuestionLoad {
-    private var questionMutableLiveData: MutableLiveData<List<Question>> = MutableLiveData()
-    private var repository : QuestionRepository = QuestionRepository(this)
+class QuestionViewModel : ViewModel() {
+    private var _questionMutableLiveData: MutableLiveData<List<Question>> = MutableLiveData()
+    val questionMutableLiveData : LiveData<List<Question>> get() = _questionMutableLiveData
+
+    private var repository : QuestionRepository = QuestionRepository()
     private var currentIndexQuestion : Int = 0
     private var correctAnswerNum : Int = 0
-    private var incorrectAnswerNum : Int = 0
+    private var _incorrectAnswerNum : Int = 0
+    val incorrectAnswerNum get() = _incorrectAnswerNum
 
     fun setCorrectAnswerNum(correctAnswerNum: Int){
         this.correctAnswerNum = correctAnswerNum
     }
 
-    fun setIncorrectAnswerNum(incorrectAnswerNum : Int){
-        this.incorrectAnswerNum = incorrectAnswerNum
+    fun setIncorrectAnswerNum(_incorrectAnswerNum : Int){
+        this._incorrectAnswerNum = _incorrectAnswerNum
     }
+
 
     fun getQuestionNum():Int?{
         return repository.getQuestionNum()
@@ -31,15 +35,9 @@ class QuestionViewModel : ViewModel(), OnQuestionLoad {
         currentIndexQuestion = index
     }
 
-    fun getQuestionMutableLiveData() : MutableLiveData<List<Question>>{
-        return questionMutableLiveData
-    }
-
     fun getQuestions(){
-        repository.getQuestions()
-    }
-
-    override fun onLoad(questionModels: MutableList<Question>) {
-        questionMutableLiveData.value = questionModels
+        repository.getQuestions(onQuestionLoad = { listQuestions ->
+            _questionMutableLiveData.postValue(listQuestions)
+        })
     }
 }

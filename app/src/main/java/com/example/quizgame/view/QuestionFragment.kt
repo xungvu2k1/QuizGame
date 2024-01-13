@@ -17,32 +17,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.quizgame.R
+import com.example.quizgame.databinding.FragmentQuestionBinding
 import com.example.quizgame.model.Question
 import com.example.quizgame.model.Score
 import com.example.quizgame.viewmodel.QuestionViewModel
 
 
 class QuestionFragment : Fragment() {
+
+    private lateinit var mFragmentQuestionBinding : FragmentQuestionBinding
     private lateinit var viewModel : QuestionViewModel
     private lateinit var navController: NavController
-    private lateinit var progressBar: ProgressBar
-    private lateinit var option1Btn : Button
-    private lateinit var option2Btn : Button
-    private lateinit var option3Btn : Button
-    private lateinit var option4Btn : Button
-    private lateinit var nextQueBtn : Button
-    private lateinit var finishBtn : Button
-    private lateinit var questionTv : TextView
-    private lateinit var questionNumberTv : TextView
-    private lateinit var timerCountTv : TextView
-    private lateinit var correctAnswerText : TextView
-    private lateinit var wrongAnswerText : TextView
-    private lateinit var questionCountText: TextView
-    private lateinit var timeCountText: TextView
     private lateinit var answer : String
-    private lateinit var num_correct_answerTv : TextView
-    private lateinit var num_incorrect_answerTv : TextView
-
 
     private var countdownTimer : CountDownTimer? = null
     private var correctAnswerNum : Int = 0
@@ -52,7 +38,6 @@ class QuestionFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))[QuestionViewModel::class.java]
         viewModel = ViewModelProvider(this)[QuestionViewModel::class.java]
     }
 
@@ -60,8 +45,9 @@ class QuestionFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        mFragmentQuestionBinding = FragmentQuestionBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_question, container, false)
+        return mFragmentQuestionBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,25 +55,7 @@ class QuestionFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
-        progressBar = view.findViewById(R.id.pb_progress_bar)
-        option1Btn = view.findViewById(R.id.option1Btnx)
-        option2Btn = view.findViewById(R.id.option2Btnx)
-        option3Btn = view.findViewById(R.id.option3Btnx)
-        option4Btn = view.findViewById(R.id.option4Btnx)
-        nextQueBtn = view.findViewById(R.id.nextQueBtnx)
-        finishBtn = view.findViewById(R.id.finishBtn)
-        questionTv = view.findViewById(R.id.questionContent)
-        correctAnswerText = view.findViewById(R.id.textView4)
-        wrongAnswerText = view.findViewById(R.id.textView2)
-        questionCountText = view.findViewById(R.id.textViewx)
-        timeCountText = view.findViewById(R.id.timeCount_text)
-
-        questionNumberTv = view.findViewById(R.id.questionNumber)
-        timerCountTv = view.findViewById(R.id.tv_timer_count)
-        num_correct_answerTv = view.findViewById(R.id.num_correct_answer)
-        num_incorrect_answerTv = view.findViewById(R.id.num_incorrect_answer)
-
-        finishBtn.setOnClickListener{
+        mFragmentQuestionBinding.finishBtn.setOnClickListener{
             //ấn finish thì chuyển đi số câu đúng, các câu chưa chọn thì sai hết
             val score = Score(viewModel.getQuestionNum()!! - correctAnswerNum, correctAnswerNum)
             val bundle = Bundle().apply {
@@ -96,11 +64,11 @@ class QuestionFragment : Fragment() {
             //show dialog and move to result page
             showQuizGameDialog(requireContext(), bundle)
         }
-        nextQueBtn.setOnClickListener{
+        mFragmentQuestionBinding.nextQueBtnx.setOnClickListener{
             if (!isAnswerSelected && !isIncreased ) {
                 // Người dùng không chọn đáp án, tăng số câu sai lên 1
                 incorrectAnswerNum++
-                num_incorrect_answerTv.text = incorrectAnswerNum.toString()
+                mFragmentQuestionBinding.numIncorrectAnswer.text = incorrectAnswerNum.toString()
                 viewModel.setIncorrectAnswerNum(incorrectAnswerNum)
             }
 
@@ -156,21 +124,21 @@ class QuestionFragment : Fragment() {
     }
 
     private fun resetUI() {
-        option1Btn.setBackgroundColor(Color.WHITE)
-        option2Btn.setBackgroundColor(Color.WHITE)
-        option3Btn.setBackgroundColor(Color.WHITE)
-        option4Btn.setBackgroundColor(Color.WHITE)
-        option1Btn.isEnabled = true
-        option2Btn.isEnabled = true
-        option3Btn.isEnabled = true
-        option4Btn.isEnabled = true
+        mFragmentQuestionBinding.option1Btnx.setBackgroundColor(Color.WHITE)
+        mFragmentQuestionBinding.option2Btnx.setBackgroundColor(Color.WHITE)
+        mFragmentQuestionBinding.option3Btnx.setBackgroundColor(Color.WHITE)
+        mFragmentQuestionBinding.option4Btnx.setBackgroundColor(Color.WHITE)
+        mFragmentQuestionBinding.option1Btnx.isEnabled = true
+        mFragmentQuestionBinding.option2Btnx.isEnabled = true
+        mFragmentQuestionBinding.option3Btnx.isEnabled = true
+        mFragmentQuestionBinding.option4Btnx.isEnabled = true
         countdownTimer?.cancel()
-        timerCountTv.text = ""
+        mFragmentQuestionBinding.tvTimerCount.text = ""
     }
 
     private fun loadQuestions(currentIndexQuestion : Int){
         hideQuizViews()
-        viewModel.getQuestionMutableLiveData().observe(viewLifecycleOwner){
+        viewModel.questionMutableLiveData.observe(viewLifecycleOwner){
             listQuestion->
             if (listQuestion != null){
                 showQuizViews()
@@ -180,39 +148,39 @@ class QuestionFragment : Fragment() {
         }
     }
     private fun hideQuizViews() {
-        option1Btn.visibility = View.INVISIBLE
-        option3Btn.visibility = View.INVISIBLE
-        option2Btn.visibility = View.INVISIBLE
-        option4Btn.visibility = View.INVISIBLE
-        questionTv.visibility = View.INVISIBLE
-        nextQueBtn.visibility = View.INVISIBLE
-        finishBtn.visibility = View.INVISIBLE
-        correctAnswerText.visibility = View.INVISIBLE
-        wrongAnswerText.visibility = View.INVISIBLE
-        num_correct_answerTv.visibility = View.INVISIBLE
-        num_incorrect_answerTv.visibility = View.INVISIBLE
-        questionCountText.visibility = View.INVISIBLE
-        timeCountText.visibility = View.INVISIBLE
-        timerCountTv.visibility = View.INVISIBLE
-        questionNumberTv.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.option1Btnx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.option3Btnx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.option2Btnx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.option4Btnx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.questionContent.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.nextQueBtnx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.finishBtn.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.textView4.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.textView2.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.numCorrectAnswer.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.numIncorrectAnswer.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.textViewx.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.timeCountText.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.tvTimerCount.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.questionNumber.visibility = View.INVISIBLE
     }
     private fun showQuizViews() {
-        progressBar.visibility = View.INVISIBLE
-        option1Btn.visibility = View.VISIBLE
-        option3Btn.visibility = View.VISIBLE
-        option2Btn.visibility = View.VISIBLE
-        option4Btn.visibility = View.VISIBLE
-        questionTv.visibility = View.VISIBLE
-        nextQueBtn.visibility = View.VISIBLE
-        finishBtn.visibility = View.VISIBLE
-        correctAnswerText.visibility = View.VISIBLE
-        wrongAnswerText.visibility = View.VISIBLE
-        num_correct_answerTv.visibility = View.VISIBLE
-        num_incorrect_answerTv.visibility = View.VISIBLE
-        questionCountText.visibility = View.VISIBLE
-        timeCountText.visibility = View.VISIBLE
-        timerCountTv.visibility = View.VISIBLE
-        questionNumberTv.visibility = View.VISIBLE
+        mFragmentQuestionBinding.pbProgressBar.visibility = View.INVISIBLE
+        mFragmentQuestionBinding.option1Btnx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.option3Btnx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.option2Btnx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.option4Btnx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.questionContent.visibility = View.VISIBLE
+        mFragmentQuestionBinding.nextQueBtnx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.finishBtn.visibility = View.VISIBLE
+        mFragmentQuestionBinding.textView4.visibility = View.VISIBLE
+        mFragmentQuestionBinding.textView2.visibility = View.VISIBLE
+        mFragmentQuestionBinding.numCorrectAnswer.visibility = View.VISIBLE
+        mFragmentQuestionBinding.numIncorrectAnswer.visibility = View.VISIBLE
+        mFragmentQuestionBinding.textViewx.visibility = View.VISIBLE
+        mFragmentQuestionBinding.timeCountText.visibility = View.VISIBLE
+        mFragmentQuestionBinding.tvTimerCount.visibility = View.VISIBLE
+        mFragmentQuestionBinding.questionNumber.visibility = View.VISIBLE
     }
 
     fun displayQuizData(questionModel : Question, questionOrder: Int){
@@ -221,27 +189,27 @@ class QuestionFragment : Fragment() {
 
         countdownTimer?.cancel()
 
-        questionTv.text = questionModel.questionContent
-        option1Btn.text = questionModel.option_a
-        option2Btn.text = questionModel.option_b
-        option3Btn.text = questionModel.option_c
-        option4Btn.text = questionModel.option_d
+        mFragmentQuestionBinding.questionContent.text = questionModel.questionContent
+        mFragmentQuestionBinding.option1Btnx.text = questionModel.option_a
+        mFragmentQuestionBinding.option2Btnx.text = questionModel.option_b
+        mFragmentQuestionBinding.option3Btnx.text = questionModel.option_c
+        mFragmentQuestionBinding.option4Btnx.text = questionModel.option_d
         answer = questionModel.answer
-        questionNumberTv.text = (questionOrder+1).toString()
+        mFragmentQuestionBinding.questionNumber.text = (questionOrder+1).toString()
 
-        option1Btn.setOnClickListener{
+        mFragmentQuestionBinding.option1Btnx.setOnClickListener{
             checkAnswer(questionModel.option_a.trim(), questionModel.answer.trim())
             disableButton()
         }
-        option2Btn.setOnClickListener{
+        mFragmentQuestionBinding.option2Btnx.setOnClickListener{
             checkAnswer(questionModel.option_b.trim(), questionModel.answer.trim())
             disableButton()
         }
-        option3Btn.setOnClickListener{
+        mFragmentQuestionBinding.option3Btnx.setOnClickListener{
             checkAnswer(questionModel.option_c.trim(), questionModel.answer.trim())
             disableButton()
         }
-        option4Btn.setOnClickListener{
+        mFragmentQuestionBinding.option4Btnx.setOnClickListener{
             checkAnswer(questionModel.option_d.trim(), questionModel.answer.trim())
             disableButton()
         }
@@ -251,26 +219,26 @@ class QuestionFragment : Fragment() {
 
     fun checkAnswer(selectedAns : String, answer : String){
         when (answer){
-            option1Btn.text.toString() -> setButtonBackground(option1Btn, true)
-            option2Btn.text.toString() -> setButtonBackground(option2Btn, true)
-            option3Btn.text.toString() -> setButtonBackground(option3Btn, true)
-            option4Btn.text.toString() -> setButtonBackground(option4Btn, true)
+            mFragmentQuestionBinding.option1Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option1Btnx, true)
+            mFragmentQuestionBinding.option2Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option2Btnx, true)
+            mFragmentQuestionBinding.option3Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option3Btnx, true)
+            mFragmentQuestionBinding.option4Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option4Btnx, true)
         }
         if (selectedAns == answer){
             correctAnswerNum++
-            num_correct_answerTv.text = correctAnswerNum.toString()
+            mFragmentQuestionBinding.numCorrectAnswer.text = correctAnswerNum.toString()
             viewModel.setCorrectAnswerNum(correctAnswerNum)
         } else {
             incorrectAnswerNum += 1
             isIncreased = true
-            num_incorrect_answerTv.text = incorrectAnswerNum.toString()
+            mFragmentQuestionBinding.numIncorrectAnswer.text = incorrectAnswerNum.toString()
             viewModel.setIncorrectAnswerNum(incorrectAnswerNum)
 
             when (selectedAns) {
-                option1Btn.text.toString() -> setButtonBackground(option1Btn, false)
-                option2Btn.text.toString() -> setButtonBackground(option2Btn, false)
-                option3Btn.text.toString() -> setButtonBackground(option3Btn, false)
-                option4Btn.text.toString() -> setButtonBackground(option4Btn, false)
+                mFragmentQuestionBinding.option1Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option1Btnx, false)
+                mFragmentQuestionBinding.option2Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option2Btnx, false)
+                mFragmentQuestionBinding.option3Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option3Btnx, false)
+                mFragmentQuestionBinding.option4Btnx.text.toString() -> setButtonBackground(mFragmentQuestionBinding.option4Btnx, false)
             }
         }
         // đánh dấu user đã chọn đáp án
@@ -278,10 +246,10 @@ class QuestionFragment : Fragment() {
 
     }
     private fun disableButton(){
-        option1Btn.isEnabled = false
-        option2Btn.isEnabled = false
-        option3Btn.isEnabled = false
-        option4Btn.isEnabled = false
+        mFragmentQuestionBinding.option1Btnx.isEnabled = false
+        mFragmentQuestionBinding.option2Btnx.isEnabled = false
+        mFragmentQuestionBinding.option3Btnx.isEnabled = false
+        mFragmentQuestionBinding.option4Btnx.isEnabled = false
     }
     fun countTimer(){
         countdownTimer = object : CountDownTimer(3000, 1000) {
@@ -289,21 +257,21 @@ class QuestionFragment : Fragment() {
             override fun onTick(millisUntilFinished: Long) {
                 // Thực hiện hành động trong mỗi tick (1 giây trong trường hợp này)
                 val secondsRemaining = millisUntilFinished / 1000
-                timerCountTv.text = "$secondsRemaining"
+                mFragmentQuestionBinding.tvTimerCount.text = "$secondsRemaining"
             }
 
             override fun onFinish() {
-                timerCountTv.text = "0"
+                mFragmentQuestionBinding.tvTimerCount.text = "0"
 
                 if (!isAnswerSelected) {
                     // Nếu không chọn đáp án
                     incorrectAnswerNum++
                     isIncreased = true
-                    num_incorrect_answerTv.text = incorrectAnswerNum.toString()
+                    mFragmentQuestionBinding.numIncorrectAnswer.text = incorrectAnswerNum.toString()
                     viewModel.setIncorrectAnswerNum(incorrectAnswerNum)
                 }
 
-                questionTv.text = "Sorry, Time is up! Continue \n with next question."
+                mFragmentQuestionBinding.questionContent.text = "Sorry, Time is up! Continue \n with next question."
                 disableButton()
             }
         }.start()

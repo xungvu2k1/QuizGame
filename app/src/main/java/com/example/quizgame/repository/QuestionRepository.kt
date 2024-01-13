@@ -6,31 +6,26 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class QuestionRepository(var onQuestionLoad : OnQuestionLoad) {
+class QuestionRepository {
     private val firebaseFirestore: FirebaseFirestore = Firebase.firestore
-    private var questionNum : Int? = null
-
+    private var _questionNum : Int? = null
+    private lateinit var _listQuestion : MutableList<Question>
     fun getQuestionNum():Int?{
-        return questionNum
+        return _questionNum
     }
 
-    fun getQuestions(){
-        val _listQuestion = mutableListOf<Question>()
+    fun getQuestions(onQuestionLoad : (MutableList<Question>?) -> Unit){
+        _listQuestion = mutableListOf()
         firebaseFirestore.collection("questions").get()
             .addOnSuccessListener{listQuestion->
-            if (listQuestion != null){
                 for (question in listQuestion){
                     val _question = question.toObject(Question::class.java)
                     _listQuestion.add(_question)
                 }
-                questionNum = _listQuestion.size
-                onQuestionLoad.onLoad(_listQuestion)
-            } else {
-                Log.e("getQuestions", "listQuestion null")
+                _questionNum = _listQuestion.size
+                onQuestionLoad(_listQuestion) // callback
+            }.addOnFailureListener{
+                Log.e("mycodeisblocking", "Error getting data")
             }
-        }
     }
-}
-interface OnQuestionLoad{
-    fun onLoad(questionModels :  MutableList<Question>)
 }

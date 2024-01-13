@@ -12,7 +12,20 @@
           "package_name": "com.example.quizgame"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1043392332525-t4atqop5u2bk19fifq7tj1c5ndij8qe2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.quizgame",
+            "certificate_hash": "af21e9f166fdcd769bb76612e3250ecbcbe9b4ec"
+          }
+        },
+        {
+          "client_id": "1043392332525-a0rd04tpju473ijlg40c9ibkenl6m4d8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCP2fQwjfpkzq7FEOksmZSATcxfqMKLvxE"
@@ -20,26 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:1043392332525:android:eae4ea8703beec0f02c2e4",
-        "android_client_info": {
-          "package_name": "com.example.testreadwritefirestore"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCP2fQwjfpkzq7FEOksmZSATcxfqMKLvxE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1043392332525-a0rd04tpju473ijlg40c9ibkenl6m4d8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

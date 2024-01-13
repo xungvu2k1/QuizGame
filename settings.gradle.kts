@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "QuizGame"
 include(":app")
- 
+include(":mylibrary")

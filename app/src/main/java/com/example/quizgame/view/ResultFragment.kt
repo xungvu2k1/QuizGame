@@ -1,5 +1,6 @@
 package com.example.quizgame.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,17 +12,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.example.mylibrary.ChangeContent
 import com.example.quizgame.R
+import com.example.quizgame.databinding.FragmentResultBinding
 import com.example.quizgame.model.Score
 import com.example.quizgame.viewmodel.ScoreViewModel
 
 class ResultFragment : Fragment() {
+    private lateinit var mFragmentResultBinding : FragmentResultBinding
     private lateinit var viewModel : ScoreViewModel
     private lateinit var navController: NavController
-    private lateinit var exitBtn : Button
-    private lateinit var playAgainBtn : Button
-    private lateinit var num_correct_answerTv : TextView
-    private lateinit var num_incorrect_answerTv : TextView
+
+    private lateinit var tv_check_lib_module : TextView
 
 
     private var correctAnswerNum : Int = 0
@@ -36,34 +38,33 @@ class ResultFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        mFragmentResultBinding = FragmentResultBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_result, container, false)
+        return mFragmentResultBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-        exitBtn = view.findViewById(R.id.btn_exit)
-        playAgainBtn = view.findViewById(R.id.btn_play_again)
-        num_correct_answerTv = view.findViewById(R.id.id_num_correc_answer)
-        num_incorrect_answerTv = view.findViewById(R.id.id_num_incorrec_answer)
-
 
         getBundle()
-        num_correct_answerTv.text = correctAnswerNum.toString()
-        num_incorrect_answerTv.text = incorrectAnswerNum.toString()
+        mFragmentResultBinding.idNumCorrecAnswer.text = correctAnswerNum.toString()
+        mFragmentResultBinding.idNumIncorrecAnswer.text = incorrectAnswerNum.toString()
 
         // gửi data lên firebase
         viewModel.sendScore(Score(incorrectAnswerNum, correctAnswerNum))
 
         // xử lý sự kiện
-        playAgainBtn.setOnClickListener{
+        mFragmentResultBinding.btnPlayAgain.setOnClickListener{
             navController.navigate(R.id.questionFragment)
         }
 
-        exitBtn.setOnClickListener{
+        mFragmentResultBinding.btnExit.setOnClickListener{
             navController.navigate(R.id.loginFragment)
+        }
+        mFragmentResultBinding.tvCheckLibModule.setOnClickListener{
+            mFragmentResultBinding.tvCheckLibModule.text = ChangeContent().textButtonContent
         }
 
     }
